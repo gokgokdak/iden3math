@@ -1,5 +1,6 @@
 #include <iden3math/hash/keccak.h>
 #include <iden3math/serialize.h>
+#include <cstring>
 
 namespace iden3math::hash {
 

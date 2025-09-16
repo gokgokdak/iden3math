@@ -4,6 +4,7 @@
 #include <iden3math/hash/blake.h>
 #include <iden3math/hash/pedersen.h>
 #include <iden3math/serialize.h>
+#include <cmath>
 #include <mutex>
 #include <unordered_map>
 

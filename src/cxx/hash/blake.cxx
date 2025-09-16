@@ -1,4 +1,5 @@
 #include <iden3math/hash/blake.h>
+#include <cstring>
 
 namespace iden3math::hash {
 
