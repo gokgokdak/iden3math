@@ -11,6 +11,8 @@ build-backend = "scikit_build_core.build"
 [project]
 name = "iden3math"
 version = "{}"
+readme = {{ file = "README.md", content-type = "text/markdown" }}
+license = {{ file = "LICENSE" }}
 requires-python = ">=3.8,<3.14"
 
 [tool.scikit-build]
@@ -39,6 +41,7 @@ if __name__ == "__main__":
     cmake_args = cmake_args.rstrip(',\n')
 
     # Format the template with the cmake arguments
+    print(template)
     pyproject_toml: str = template.format(version, cmake_args)
 
     # Write to pyproject.toml
