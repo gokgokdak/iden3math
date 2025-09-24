@@ -8,7 +8,7 @@ set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product")
 # Python binding
 if(BUILD_PY)
     # Include local Python headers
-    find_package(Python COMPONENTS Interpreter Development REQUIRED)
+    find_package(Python COMPONENTS Interpreter Development.Module REQUIRED)
     message("-- Python Include: ${Python_INCLUDE_DIRS}")
     message("-- Python Executable: ${Python_EXECUTABLE}")
     include_directories(${Python_INCLUDE_DIRS})
