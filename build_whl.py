@@ -13,7 +13,7 @@ name = "iden3math"
 version = "{}"
 readme = {{ file = "README.md", content-type = "text/markdown" }}
 license = {{ file = "LICENSE" }}
-requires-python = ">=3.8,<3.14"
+requires-python = ">=3.8,<=3.14"
 
 [tool.scikit-build]
 cmake.minimum-version = "3.18"
