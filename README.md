@@ -22,10 +22,9 @@ For now, it is only a minimal implementation for Tornado Cash project, not all t
 
 ### Python & pip
 - Python >= 3.8
-- cibuildwheel
-- scikit-build-core
-- pybind11
-- unittest
+- cibuildwheel >= 3.2.1
+- scikit-build-core >= 0.11.6
+- pybind11 >= 3.0.1
 
 ## Build C++ Library
 
