@@ -21,7 +21,7 @@ BigInt::BigInt(int64_t num) : impl_(new Impl()) {
     }
 }
 
-BigInt::BigInt(uint64_t num) {
+BigInt::BigInt(uint64_t num) : impl_(new Impl()) {
     mpz_import(impl_->get_mpz_t(), 1, -1, sizeof(num), 0, 0, &num);
 }
 
