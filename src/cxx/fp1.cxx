@@ -110,19 +110,19 @@ std::optional<BigInt> Fp1::sqrt(BigInt a) const {
         return std::nullopt;
     }
     auto w = *opt_w;
-    BigInt v = s_;
+    int32_t v = s_;
     BigInt z = z_;
     BigInt x = mul(a, w);
     BigInt b = mul(x, w);
     while (1 != b) {
         BigInt b2k = square(b);
-        BigInt k = 1;
+        int32_t k = 1;
         while (1 != b2k) {
             b2k = square(b2k);
             ++k;
         }
         w = z;
-        for (BigInt i = 0; i < v - k - 1; ++i) {
+        for (int32_t i = 0; i < v - k - 1; ++i) {
             w = square(w);
         }
         z = square(w);
