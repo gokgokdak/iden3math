@@ -1,4 +1,5 @@
 #include <iden3math/ec/babyjub.h>
+#include <iden3math/ec/twisted_edwards.h>
 #include <iden3math/prime.h>
 #include <iden3math/serialize.h>
 
@@ -17,6 +18,11 @@ const BigInt& prime() { return prime::bn254(); }
 const Fp1& finite_field() {
     static const Fp1 F(prime::bn254());
     return F;
+}
+
+const twisted_edwards::Curve& curve() {
+    static const twisted_edwards::Curve CURVE(finite_field(), A, D);
+    return CURVE;
 }
 
 const BigInt& group_order() {
@@ -47,40 +53,11 @@ inline const Fp1& f() { // Shorter name for convenience
 }
 
 Point add(const Point& a, const Point& b) {
-    Point r;
-    auto beta = f().mul(a.x, b.y);
-    auto gamma = f().mul(a.y, b.x);
-    auto delta = f().mul(
-        f().sub(a.y, f().mul(A, a.x)),
-        f().add(b.x, b.y)
-    );
-    auto tau = f().mul(beta, gamma);
-    auto dtau = f().mul(D, tau);
-    r.x = *f().div(
-        f().add(beta, gamma),
-        f().add(1, dtau)
-    );
-    r.y = *f().div(
-        f().add(delta, f().sub(f().mul(A, beta), gamma)),
-        f().sub(1, dtau)
-    );
-    return r;
+    return twisted_edwards::add(curve(), a, b);
 }
 
 Point mul_scalar(const Point& p, const BigInt& k) {
-    Point r;
-    r.x = 0;
-    r.y = 1;
-    BigInt rem = k;
-    Point exp = p;
-    while (0 != rem) {
-        if (rem.odd()) {
-            r = add(r, exp);
-        }
-        exp = add(exp, exp);
-        rem >>= 1;
-    }
-    return r;
+    return twisted_edwards::mul_scalar(curve(), p, k);
 }
 
 bool in_sub_group(const Point& p) {
@@ -92,11 +69,7 @@ bool in_sub_group(const Point& p) {
 }
 
 bool in_curve(const Point& p) {
-    auto x2 = *f().pow(p.x, 2); // Always not std::nullopt because exp is 2 >= 0
-    auto y2 = *f().pow(p.y, 2); // Always not std::nullopt because exp is 2 >= 0
-    auto lhs = f().add(f().mul(A, x2), y2); // A * x² + y²
-    auto rhs =  f().add(1, f().mul(f().mul(x2, y2), D)); // 1 + D * x² * y²
-    return lhs == rhs;
+    return twisted_edwards::in_curve(curve(), p);
 }
 
 ByteVec1D compress(const Point& p, Endian endian) {
