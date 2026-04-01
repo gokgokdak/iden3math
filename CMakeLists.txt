@@ -2,8 +2,16 @@ cmake_minimum_required(VERSION 3.18)
 
 project(iden3math)
 
+# Options
 set(CMAKE_CXX_STANDARD 20)
 set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product")
+option(BUILD_PY "Build Python bindings" OFF)
+option(BUILD_TEST "Build unit tests" ON)
+option(GMP_ENABLE_ASM "Enable GMP assembly optimizations" OFF)
+option(GMP_ENABLE_CXX "Enable GMP C++ interface" ON)
+option(GMP_BUILD_SHARED "Build shared GMP library" OFF)
+option(GMP_BUILD_STATIC "Build static GMP library" ON)
+option(GMP_BUILD_TESTS "Build GMP tests" ON)
 
 # Python binding
 if(BUILD_PY)
@@ -26,18 +34,7 @@ if(BUILD_PY)
 endif()
 
 # Dependency GMP
-if(NOT GMP_INC_DIR)
-    message(FATAL_ERROR "GMP include path not set")
-endif()
-if(NOT GMP_LIB_DIR)
-    message(FATAL_ERROR "GMP library path not set")
-endif()
-include_directories(${GMP_INC_DIR})
-if(WIN32)
-    file(GLOB_RECURSE GMP_LIBS "${GMP_LIB_DIR}/*.lib")
-else()
-    file(GLOB_RECURSE GMP_LIBS "${GMP_LIB_DIR}/*.a")
-endif()
+add_subdirectory(${CMAKE_SOURCE_DIR}/deps/libgmp-cmake EXCLUDE_FROM_ALL)
 
 # Source files
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -58,29 +55,21 @@ else()
     add_library(iden3math SHARED ${LIB_SOURCES_CXX})
     target_compile_definitions(iden3math PRIVATE IDEN3MATH_BUILD_DYNAMIC)
 endif()
-target_link_libraries(iden3math PRIVATE ${GMP_LIBS})
+target_link_libraries(iden3math PRIVATE GMP::gmpxx)
 
 # Unit tests
 if(BUILD_TEST)
     # Dependency gtest
-    if(NOT GTEST_INC_DIR)
-        message(FATAL_ERROR "GTest include path not set")
-    endif()
-    if(NOT GTEST_LIB_DIR)
-        message(FATAL_ERROR "GTest library path not set")
-    endif()
-    include_directories(${GTEST_INC_DIR})
-    if(WIN32)
-        file(GLOB_RECURSE GTEST_LIBS "${GTEST_LIB_DIR}/*.lib")
-    else()
-        file(GLOB_RECURSE GTEST_LIBS "${GTEST_LIB_DIR}/*.a")
-    endif()
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
+    set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+    add_subdirectory(${CMAKE_SOURCE_DIR}/deps/googletest EXCLUDE_FROM_ALL)
 
     # Executable
     file(GLOB_RECURSE TEST_SOURCES "${CMAKE_SOURCE_DIR}/test/cxx/*.cxx")
     add_executable(iden3math_test ${TEST_SOURCES} ${LIB_SOURCES_CXX})
     target_compile_definitions(iden3math_test PRIVATE IDEN3MATH_BUILD_TEST)
-    target_link_libraries(iden3math_test ${GTEST_LIBS} ${GMP_LIBS})
+    target_link_libraries(iden3math_test PRIVATE GMP::gmpxx gtest gtest_main)
 
     # Add tests
     enable_testing()
