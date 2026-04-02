@@ -56,6 +56,9 @@ else()
     target_compile_definitions(iden3math PRIVATE IDEN3MATH_BUILD_DYNAMIC)
 endif()
 target_link_libraries(iden3math PRIVATE GMP::gmpxx)
+if(WIN32 AND MINGW)
+    target_link_libraries(iden3math PRIVATE bcrypt)
+endif()
 
 # Unit tests
 if(BUILD_TEST)
@@ -70,6 +73,9 @@ if(BUILD_TEST)
     add_executable(iden3math_test ${TEST_SOURCES} ${LIB_SOURCES_CXX})
     target_compile_definitions(iden3math_test PRIVATE IDEN3MATH_BUILD_TEST)
     target_link_libraries(iden3math_test PRIVATE GMP::gmpxx gtest gtest_main)
+    if(WIN32 AND MINGW)
+        target_link_libraries(iden3math_test PRIVATE bcrypt)
+    endif()
 
     # Add tests
     enable_testing()
