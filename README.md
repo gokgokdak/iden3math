@@ -45,14 +45,7 @@ To build the C++ shared object library, follow these steps:
 
 3. Run CMake to configure the project:
     ```bash
-    cmake .. \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_PY=OFF \
-        -DBUILD_TEST=ON \
-        -DGMP_INC_DIR="{gmp_include_dir}" \
-        -DGMP_LIB_DIR="{gmp_library_dir}" \
-        -DGTEST_INC_DIR="{googletest_include_dir}" \
-        -DGTEST_LIB_DIR="{googletest_library_dir}"
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_PY=OFF -DBUILD_TEST=ON 
     ```
 
 4. Build the project:
@@ -71,15 +64,9 @@ To build the Python wheel, use the `build_whl.py` script, it accepts CMake argum
    pip3 install scikit-build-core pybind11 cibuildwheel
    ```
 
-2. Run the `build_whl.py` script with the necessary CMake options:
+2. Run the `build_whl.py` script with CMake options:
    ```bash
-   python3 build_whl.py -DCMAKE_BUILD_TYPE=Release \
-                        -DBUILD_PY=ON \
-                        -DBUILD_TEST=ON \
-                        -DGMP_INC_DIR="{gmp_include_dir}" \
-                        -DGMP_LIB_DIR="{gmp_library_dir}" \
-                        -DGTEST_INC_DIR="{googletest_include_dir}" \
-                        -DGTEST_LIB_DIR="{googletest_library_dir}"
+   python3 build_whl.py -DCMAKE_BUILD_TYPE=Release -DBUILD_PY=ON -DBUILD_TEST=ON
    ```
 
 3. The wheel file will be generated in the `wheelhouse` directory.
