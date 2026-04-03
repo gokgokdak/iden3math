@@ -3,8 +3,12 @@
 #if defined(__linux__) || defined(__APPLE__) || defined(__unix__)
     #include <cstdio>
 #elif defined(_WIN32)
-    #define NOMINMAX
-    #define WIN32_LEAN_AND_MEAN
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN
+    #endif
     #include <windows.h>
     #include <bcrypt.h>
     #pragma comment(lib, "bcrypt.lib")
