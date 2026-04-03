@@ -3,6 +3,7 @@
 #include <iden3math/bitvec.h>
 #include <iden3math/macro.h>
 #include <iden3math/typedef.h>
+#include <functional>
 #include <optional>
 #include <string>
 
