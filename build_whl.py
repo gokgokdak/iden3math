@@ -20,8 +20,7 @@ cmake.minimum-version = "3.18"
 cmake.verbose = false
 cmake.build-type = "Release"
 cmake.args = [
-    "-DBUILD_PY=ON",
-    "-DBUILD_TEST=ON"{}
+    "-DBUILD_PY=ON"{}
 ]
 
 [tool.cibuildwheel]
@@ -50,8 +49,8 @@ if __name__ == "__main__":
 
     # Run cibuildwheel
     if 'win' in platform.system().lower():
-        os.system('set PIP_NO_VERIFY_CERTS=1 & set PIP_TRUSTED_HOST=pypi.org & cibuildwheel --output-dir wheelhouse')
+        os.system('set PIP_NO_VERIFY_CERTS=1 & set PIP_TRUSTED_HOST=pypi.org & cibuildwheel --output-dir product')
     elif 'linux' in platform.system().lower() or 'darwin' in platform.system().lower():
-        os.system('export PIP_NO_VERIFY_CERTS=1; export PIP_TRUSTED_HOST=pypi.org; cibuildwheel --output-dir wheelhouse')
+        os.system('export PIP_NO_VERIFY_CERTS=1; export PIP_TRUSTED_HOST=pypi.org; cibuildwheel --output-dir product')
     else:
-        os.system('cibuildwheel --output-dir wheelhouse')
+        os.system('cibuildwheel --output-dir product')

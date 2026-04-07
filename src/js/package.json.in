@@ -1,0 +1,29 @@
+{
+  "name": "iden3math",
+  "version": "@IDEN3MATH_VERSION@",
+  "description": "WebAssembly and browser-friendly bindings for iden3math.",
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "iden3",
+    "wasm",
+    "npm",
+    "browser",
+    "bn254"
+  ]
+}

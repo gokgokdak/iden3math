@@ -1,6 +1,8 @@
 #include <iden3math/bigint.h>
 #include <random>
-#if defined(__linux__) || defined(__APPLE__) || defined(__unix__)
+#if defined(__EMSCRIPTEN__)
+    #include <emscripten.h>
+#elif defined(__linux__) || defined(__APPLE__) || defined(__unix__)
     #include <cstdio>
 #elif defined(_WIN32)
     #ifndef NOMINMAX
@@ -16,13 +18,28 @@
 
 namespace iden3math::random {
 
+#if defined(__EMSCRIPTEN__)
+EM_JS(int, iden3math_fill_random_bytes, (Byte* data, size_t len), {
+    const crypto = globalThis.crypto;
+    if (!crypto || typeof crypto.getRandomValues !== "function") {
+        return 0;
+    }
+    const bytes = new Uint8Array(len);
+    crypto.getRandomValues(bytes);
+    HEAPU8.set(bytes, data);
+    return 1;
+});
+#endif
+
 ByteVec1D get_bytes(size_t len, std::optional<std::reference_wrapper<bool>> fallback) {
     ByteVec1D bytes(len);
     bool succeed = false;
     if (std::nullopt != fallback) {
         fallback->get() = false;
     }
-#if defined(__linux__) || defined(__APPLE__) || defined(__unix__)
+#if defined(__EMSCRIPTEN__)
+    succeed = iden3math_fill_random_bytes(bytes.data(), bytes.size()) != 0;
+#elif defined(__linux__) || defined(__APPLE__) || defined(__unix__)
     // Use /dev/hwrng or /dev/urandom on Unix-like systems
     auto try_read = [&](const char* path) -> bool {
         FILE* dev = fopen(path, "rb");
