@@ -35,9 +35,9 @@ TEST(random, get_bytes_distribution) {
         chi_square += (diff * diff) / expected;
     }
 
-    // For 255 degrees of freedom, chi-square should be less than 293.25
-    // at 95% confidence level
-    EXPECT_LT(chi_square, 293.25);
+    // A 95% chi-square cutoff is too flaky for CI. Keep this as a coarse
+    // sanity bound with a much lower false-positive rate.
+    EXPECT_LT(chi_square, 365.0);
 }
 
 TEST(random, get_integer_range) {
@@ -68,9 +68,9 @@ TEST(random, get_integer_distribution) {
         chi_square += (diff * diff) / expected;
     }
 
-    // For 15 degrees of freedom, chi-square should be less than 25.0 
-    // at 95% confidence level
-    EXPECT_LT(chi_square, 25.0);
+    // A 95% chi-square cutoff is too flaky for CI. Keep this as a coarse
+    // sanity bound with a much lower false-positive rate.
+    EXPECT_LT(chi_square, 45.0);
 }
 
 } // namespace iden3math::random

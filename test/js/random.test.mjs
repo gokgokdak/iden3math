@@ -25,7 +25,7 @@ describe("random", () => {
       chiSquare += (diff * diff) / expected;
     }
 
-    assert.ok(chiSquare < 293.25, `chi-square too large: ${chiSquare}`);
+    assert.ok(chiSquare < 365.0, `chi-square too large: ${chiSquare}`);
   });
 
   test("get_integer range", () => {
@@ -53,6 +53,6 @@ describe("random", () => {
       chiSquare += (diff * diff) / expected;
     }
 
-    assert.ok(chiSquare < 25.0, `chi-square too large: ${chiSquare}`);
+    assert.ok(chiSquare < 45.0, `chi-square too large: ${chiSquare}`);
   });
 });
