@@ -1,3 +1,10 @@
+[![License](https://img.shields.io/badge/license-GPLv3-green.svg)](LICENSE)
+[![Docs](https://img.shields.io/badge/docs-README-blue)](https://github.com/gokgokdak/iden3math#readme)
+[![GitHub stars](https://img.shields.io/github/stars/gokgokdak/iden3math?style=flat)](https://github.com/gokgokdak/iden3math/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/gokgokdak/iden3math)](https://github.com/gokgokdak/iden3math/issues)
+[![CMake Multiple Platforms](https://github.com/gokgokdak/iden3math/actions/workflows/cmake-multi-platform.yml/badge.svg?branch=main)](https://github.com/gokgokdak/iden3math/actions/workflows/cmake-multi-platform.yml)
+
+
 # iden3math
 
 A simple library in C++ 20 standard that replicates and encapsulates the mathematical computations used in the [iden3](https://github.com/iden3) project.
