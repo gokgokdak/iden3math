@@ -1,9 +1,13 @@
 import os
 import platform
+import shutil
 import sys
+from pathlib import Path
 
 
-template: str = """
+OUTPUT_DIR: str = os.path.join(os.path.dirname(__file__), 'product/wheel').replace('\\', '/')
+
+CMAKE_TEMPLATE: str = """
 [build-system]
 requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
@@ -20,12 +24,14 @@ cmake.minimum-version = "3.18"
 cmake.verbose = false
 cmake.build-type = "Release"
 cmake.args = [
-    "-DBUILD_PY=ON"{}
+    "-DBUILD_PY=ON",
+    "-DBUILD_WHL=ON"{}
 ]
 
 [tool.cibuildwheel]
 skip = ["*-win32", "*-ppc64le", "*-s390x"]
 """
+
 
 if __name__ == "__main__":
     # Get version.txt
@@ -40,17 +46,26 @@ if __name__ == "__main__":
     cmake_args = cmake_args.rstrip(',\n')
 
     # Format the template with the cmake arguments
-    print(template)
-    pyproject_toml: str = template.format(version, cmake_args)
+    print(CMAKE_TEMPLATE)
+    pyproject_toml: str = CMAKE_TEMPLATE.format(version, cmake_args)
 
     # Write to pyproject.toml
     with open('pyproject.toml', 'w') as f:
         f.write(pyproject_toml)
 
+    # Remove contents under output direcotry
+    path: Path = Path(OUTPUT_DIR)
+    if path.exists() and path.is_dir():
+        for child in path.iterdir():
+            if child.is_dir():
+                shutil.rmtree(child)
+            else:
+                child.unlink()
+
     # Run cibuildwheel
     if 'win' in platform.system().lower():
-        os.system('set PIP_NO_VERIFY_CERTS=1 & set PIP_TRUSTED_HOST=pypi.org & cibuildwheel --output-dir product')
+        os.system(f'set PIP_NO_VERIFY_CERTS=1 & set PIP_TRUSTED_HOST=pypi.org & cibuildwheel --output-dir {OUTPUT_DIR}')
     elif 'linux' in platform.system().lower() or 'darwin' in platform.system().lower():
-        os.system('export PIP_NO_VERIFY_CERTS=1; export PIP_TRUSTED_HOST=pypi.org; cibuildwheel --output-dir product')
+        os.system(f'export PIP_NO_VERIFY_CERTS=1; export PIP_TRUSTED_HOST=pypi.org; cibuildwheel --output-dir {OUTPUT_DIR}')
     else:
-        os.system('cibuildwheel --output-dir product')
+        os.system(f'cibuildwheel --output-dir {OUTPUT_DIR}')

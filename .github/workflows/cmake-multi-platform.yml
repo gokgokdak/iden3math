@@ -11,9 +11,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  cxx:
-    name: C++ Shared Library
-    runs-on: ubuntu-latest
+  linux-so-gcc13:
+    name: linux-so-gcc13
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout
@@ -24,19 +24,48 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake
+          sudo apt-get install -y build-essential cmake gcc-13 g++-13
+
+      - name: Check GCC toolchain
+        run: |
+          gcc-13 --version
+          g++-13 --version
 
       - name: Configure
-        run: cmake -S . -B build-cxx -DCMAKE_BUILD_TYPE=Release -DBUILD_CXX_TEST=ON
+        run: >
+          cmake -S . -B build-linux-so
+          -DCMAKE_C_COMPILER=gcc-13
+          -DCMAKE_CXX_COMPILER=g++-13
+          -DCMAKE_BUILD_TYPE=Release
+          -DBUILD_CXX_TEST=ON
 
       - name: Build
-        run: cmake --build build-cxx --config Release --target install --parallel
+        run: cmake --build build-linux-so --config Release --target install --parallel
 
       - name: Run unit tests
-        run: ./product/bin/iden3math_test
+        run: ./product/native/linux/bin/iden3math_test
+
+  windows-dll-vs2022:
+    name: windows-dll-vs2022
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        run: cmake -S . -B build-windows-dll -G "Visual Studio 17 2022" -DCMAKE_BUILD_TYPE=Release -DBUILD_CXX_TEST=ON
+
+      - name: Build
+        run: cmake --build build-windows-dll --config Release --target install --parallel
+
+      - name: Run unit tests
+        run: .\product\native\windows\bin\iden3math_test.exe
 
   python-wheel:
-    name: Python Wheel
+    name: python-wheel
     runs-on: ubuntu-latest
 
     steps:
@@ -75,7 +104,7 @@ jobs:
           from pip._vendor.packaging.tags import sys_tags
           from pip._vendor.packaging.utils import parse_wheel_filename
 
-          wheels = sorted(Path("product").glob("*.whl"))
+          wheels = sorted(Path("product/wheel").glob("*.whl"))
           supported_tags = set(sys_tags())
           matches = []
 
@@ -104,8 +133,8 @@ jobs:
         working-directory: test/py
         run: python -m unittest
 
-  wasm:
-    name: WebAssembly / npm
+  wasm-npm-emscripten-latest:
+    name: wasm-npm-emscripten-latest
     runs-on: ubuntu-latest
 
     steps:
@@ -137,15 +166,15 @@ jobs:
         shell: bash
         run: |
           source "${HOME}/emsdk/emsdk_env.sh"
-          emcmake cmake -S . -B build-wasm -DCMAKE_BUILD_TYPE=Release -DBUILD_WASM=ON
+          emcmake cmake -S . -B build-wasm-npm -DCMAKE_BUILD_TYPE=Release -DBUILD_WASM=ON
 
       - name: Build
         shell: bash
         run: |
           source "${HOME}/emsdk/emsdk_env.sh"
-          cmake --build build-wasm --config Release --target install --parallel
-          test -f product/npm/dist/index.mjs
-          test -f product/npm/package.json
+          cmake --build build-wasm-npm --config Release --target install --parallel
+          test -f ./product/javascript/npm/dist/index.mjs
+          test -f ./product/javascript/npm/package.json
 
       - name: Run unit tests
         shell: bash

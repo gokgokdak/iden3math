@@ -5,12 +5,12 @@ project(iden3math)
 set(CMAKE_CXX_STANDARD 20)
 set(IDEN3MATH_TARGET iden3math)
 set(IDEN3MATH_TEST_TARGET iden3math_test)
-set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product")
 file(STRINGS "${CMAKE_SOURCE_DIR}/version.txt" IDEN3MATH_VERSION LIMIT_COUNT 1)
 
 # Options
 option(BUILD_CXX_TEST "Build unit tests" OFF)
 option(BUILD_PY "Build Python bindings" OFF)
+option(BUILD_WHL "Build Python wheel package" OFF)
 option(BUILD_WASM "Build WebAssembly bindings and npm package" OFF)
 option(GMP_ENABLE_ASM "Enable GMP assembly optimizations" OFF)
 option(GMP_ENABLE_CXX "Enable GMP C++ interface" ON)
@@ -19,9 +19,37 @@ option(GMP_BUILD_SHARED "Build shared GMP library" OFF)
 option(GMP_BUILD_TESTS "Build GMP tests" OFF)
 if(BUILD_PY AND BUILD_WASM)
     message(FATAL_ERROR "BUILD_PY and BUILD_WASM cannot be enabled at the same time.")
-endif()
-if(BUILD_WASM AND NOT EMSCRIPTEN)
+elseif(BUILD_WHL AND NOT BUILD_PY)
+    message(FATAL_ERROR "BUILD_WHL requires BUILD_PY to be enabled.")
+elseif(BUILD_WASM AND NOT EMSCRIPTEN)
     message(FATAL_ERROR "BUILD_WASM requires the Emscripten toolchain. Use emcmake cmake ...")
+endif()
+
+# Output directories
+if(BUILD_WHL)
+    # Ignore, the build_whl.py script will handle it
+elseif(BUILD_PY)
+    if(WIN32)
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/cpython/windows")
+    elseif(APPLE)
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/cpython/macos")
+    elseif(UNIX)
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/cpython/linux")
+    else()
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/cpython/unknow")
+    endif()
+elseif(BUILD_WASM)
+    set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/javascript")
+else()
+    if(WIN32)
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/native/windows")
+    elseif(APPLE)
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/native/macos")
+    elseif(UNIX)
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/native/linux")
+    else()
+        set(PRODUCT_DIR "${CMAKE_SOURCE_DIR}/product/native/unknow")
+    endif()
 endif()
 
 # Python binding
@@ -136,27 +164,31 @@ if(BUILD_CXX_TEST)
     add_test(NAME ${IDEN3MATH_TEST_TARGET} COMMAND ${IDEN3MATH_TEST_TARGET})
 endif()
 
+# Cleanup install directory
+if(NOT BUILD_WHL)
+    install(CODE "
+        if(EXISTS ${PRODUCT_DIR})
+            file(REMOVE_RECURSE ${PRODUCT_DIR})
+        endif()
+    ")
+endif()
+
 # Install
 set(CMAKE_INSTALL_PREFIX ${PRODUCT_DIR} CACHE PATH "Installation Directory" FORCE)
-install(CODE "
-    if(EXISTS ${PRODUCT_DIR})
-        file(REMOVE_RECURSE ${PRODUCT_DIR})
-    endif()
-")
 if(BUILD_PY)
     install(DIRECTORY src/pyi/ DESTINATION iden3math)
     install(TARGETS iden3math
-            LIBRARY DESTINATION iden3math
-            ARCHIVE DESTINATION lib
+        LIBRARY DESTINATION iden3math
+        ARCHIVE DESTINATION lib
     )
 elseif(BUILD_WASM)
     install(DIRECTORY "${NPM_BUILD_DIR}/" DESTINATION npm)
 else()
     install(DIRECTORY include/ DESTINATION include)
     install(TARGETS iden3math
-            RUNTIME DESTINATION bin
-            LIBRARY DESTINATION lib
-            ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
     )
     if(BUILD_CXX_TEST)
         install(TARGETS ${IDEN3MATH_TEST_TARGET}

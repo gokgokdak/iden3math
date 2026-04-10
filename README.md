@@ -106,22 +106,22 @@ Activate the Emscripten SDK in your current shell so `emcmake` is available
 The package entrypoint is:
 
 ```bash
-product/npm/dist/index.mjs
+product/javascript/npm/dist/index.mjs
 ```
 
 and the publishable npm metadata is generated at:
 
 ```bash
-product/npm/package.json
+product/javascript/npm/package.json
 ```
 
 ## Running Tests
 
 It is **highly** recommended to run all unit tests before using the library, if any cases failed it means the calculations are not correct and the library should not be used.
 
-- For C++ shared library, make sure CMake option `BUILD_CXX_TEST` is set to `ON`, navigate to the `product` directory and run the test executable:
+- For C++ shared library, make sure CMake option `BUILD_CXX_TEST` is set to `ON`:
     ```bash
-    cd product/bin
+    cd product/native/{platform}/bin
     ./iden3math_test
     ```
   
@@ -141,7 +141,7 @@ It is **highly** recommended to run all unit tests before using the library, if 
     ```bash
     rm tests/py/*.pyd # Windows
     rm tests/py/*.so  # Linux or MacOS
-    pip3 install product/{choose_whl_for_your_platform}.whl
+    pip3 install product/wheel/{platform}.whl
     cd tests/py
     python3 -m unittest
     ```

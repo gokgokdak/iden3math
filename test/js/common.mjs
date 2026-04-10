@@ -6,7 +6,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const thisDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(thisDir, "..", "..");
 const distCandidates = [
-  path.join(repoRoot, "product", "npm", "dist"),
+  path.join(repoRoot, "product", "javascript", "npm", "dist"),
   path.join(repoRoot, "build-wasm", "npm", "dist"),
   path.join(repoRoot, "build", "npm", "dist")
 ];
